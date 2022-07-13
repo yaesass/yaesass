@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<!-- import CSS -->
+	<link rel="stylesheet" href="css/element.css">
+	<link rel="stylesheet" href="css/index.css">
+	<style>
+		.f {
+			display: flex;
+		}
+
+		.el-table {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.el-table__body-wrapper {
+			flex: 1;
+		}
+
+		.el-tabs__item {
+			margin-top: 10px;
+			width: 50%;
+			height: 60px;
+			text-align: center;
+			font-size: 36px;
+			font-weight: 300;
+			letter-spacing: 0em;
+		}
+
+		.back {
+			margin-top: -50px;
+			margin-left: 750px;
+		}
+
+		.count {
+			display: flex;
+			width: 1000px;
+			margin: 20px 60px 20px 0;
+		}
+
+		.count .counttxtl {
+			font-size: 40px;
+			margin-left: 40px;
+			width: 600px;
+			color: #909399;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.count .counttxtr {
+			font-size: 40px;
+			margin-left: 200px;
+			color: #909399;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.counttable .el-table .cell {
+			line-height: 50px;
+			font-weight: 300;
+		}
+
+		.inzeroa {
+			display: flex;
+			width: 264px;
+			height: 81px;
+			border-radius: 15px;
+			background: #D8D8D8;
+		}
+
+		.inzeroa .btntxt {
+			margin: auto;
+			font-size: 50px;
+			font-weight: 300;
+			color: #AAAAAA;
+		}
+
+		.inzero {
+			display: flex;
+			width: 264px;
+			height: 81px;
+			border-radius: 15px;
+			background: #409EFF;
+		}
+
+		.inzero .btntxt {
+			margin: auto;
+			font-size: 50px;
+			font-weight: 300;
+			color: #FFFFFF;
+		}
+
+		.zero {
+			display: flex;
+			margin: 34px auto;
+			width: 264px;
+			height: 81px;
+			border-radius: 15px;
+			background: #409EFF;
+		}
+
+		.zero .btntxt {
+			margin: auto;
+			font-size: 50px;
+			font-weight: 300;
+			color: #FFFFFF;
+		}
+
+		.outhistory {
+			display: flex;
+			margin: 34px auto;
+			width: 264px;
+			height: 81px;
+			border-radius: 15px;
+			background: #409EFF;
+		}
+
+		.outhistory .btntxt {
+			margin: auto;
+			font-size: 50px;
+			font-weight: 300;
+			color: #FFFFFF;
+		}
+
+		.out {
+			display: flex;
+			margin: 180px auto;
+			width: 300px;
+			height: 150px;
+			border-radius: 30px;
+			background: #409EFF;
+		}
+
+		.out .btntxt {
+			margin: auto;
+			font-size: 50px;
+			font-weight: 300;
+			color: #FFFFFF;
+		}
+
+		.workShop_message {
+			width: 40%;
+			font-size: 30px;
+			color: #ff7d38;
+		}
+
+		.workShop_message .btn {
+			padding: 5px 10px;
+			cursor: pointer;
+			background: #ffb89143;
+			border: 2px solid #ffb89143;
+			border-radius: 10px;
+		}
+
+		.messageclass {
+			width: 900px;
+			font-size: large;
+		}
+
+		.el-message-box__message {
+			font-size: 40px;
+			margin-bottom: 50px;
+		}
+
+		.confirmButton {
+			margin-left: -50px;
+			font-size: 40px;
+		}
+
+		.cancelButton {
+			margin-left: -100px;
+			font-size: 40px;
+		}
+	</style>
+	<!-- import Vue before Element -->
+	<script src="vue/vue.js"></script>
+	<script src="js/axios.min.js"></script>
+	<!-- import JavaScript -->
+	<script src="js/element.js"></script>
+</head>
+
+<body>
+	<div id="page">
+		<el-tabs v-model="activeName" @tab-click="handleClick" style="width:100%" :stretch="true">
+			<el-tab-pane label="实时计数统计" class='counttable' name="second" :disabled="tab">
+				<div class="count">
+					<div style="width:600px">
+						<div v-if="StockState==1&&!countkey" class="counttxtl">{{Ordername}}</div>
+					</div>
+					<div class='counttxtr'>{{Remarks}}</div>
+				</div>
+				<div v-if="Type=='out'">
+					<!-- 出库计数第一页 -->
+					<div v-if='outcountkey' class='out' @click="AddOrderOut()">
+						<div class='btntxt'>生成出库单</div>
+					</div>
+					<div v-else>
+						<!-- 出库计数第二页 -->
+						<el-table :data="list" border
+							:header-cell-style="{ background: '#F3F4F7', color: '#555', height: '97px', }"
+							:cell-style="{ padding: '0px' }" :row-style="{ height: '97px' }"
+							style="font-size: 50px;width: 910px;margin: 0 auto;" ref="table" height="400">
+							<el-table-column label="商品名称" style='heihgt:97px'>
+								<template slot-scope="scope">
+									<span v-html="scope.row.name"></span>
+								</template>
+							</el-table-column>
+							<el-table-column align="center" label="数量" width="323">
+								<template slot-scope="scope">
+									<div style="color:red">{{ scope.row.num }}</div>
+								</template>
+							</el-table-column>
+						</el-table>
+						<div class='zero' @click="zero()">
+							<div class='btntxt'>完成出库</div>
+						</div>
+					</div>
+				</div>
+				<div v-else>
+					<div v-if='countkey'>
+						<!-- 入库选择订单页 -->
+						<el-table :data="tableData" border
+							:header-cell-style="{ background: '#F2F6FC', height: '48px', color: '#909399', fontSize: '40px' }"
+							style="width: 910px; margin: 40px auto;font-size: 25px;" :cell-style="totalcellcolor"
+							height="450" :row-style="{ height: '48px' }">
+							<el-table-column align="center" label="生产单" width="630">
+								<template slot-scope="scope">
+									<span v-html="scope.row.product"></span>
+								</template>
+							</el-table-column>
+							<el-table-column align="center" label="操作">
+								<template #default="{ row }">
+									<el-button type="primary" round @click='ordercharge(row)' style='font-size: 20px;'>
+										入库
+									</el-button>
+								</template>
+							</el-table-column>
+						</el-table>
+					</div>
+					<div v-else>
+						<!-- 入库开始计数页 -->
+						<el-table :data="list" border
+							:header-cell-style="{ background: '#F3F4F7', color: '#555', height: '97px', }"
+							:cell-style="{ padding: '0px' }" :row-style="{ height: '97px' }"
+							style="font-size: 50px;width: 910px;margin: 0 auto;" ref="table" height="400">
+							<el-table-column label="商品名称" style='heihgt:97px'>
+								<template slot-scope="scope">
+									<span v-html="scope.row.name"></span>
+								</template>
+							</el-table-column>
+							<el-table-column align="center" label="数量" width="323">
+								<template slot-scope="scope">
+									<div style="color:red">{{ scope.row.num }}</div>
+								</template>
+							</el-table-column>
+						</el-table>
+						<div style='display: flex;justify-content: space-between;margin: 50px 100px;'>
+							<div v-if='list.length==0' class='inzeroa' @click='EditCloseOrderState()'>
+								<div class='btntxt'>取消入库</div>
+							</div>
+							<div v-else class='inzeroa' @click='DelCodeOrder()'>
+								<div class='btntxt'>回滚订单</div>
+							</div>
+							<div class='inzero' @click="zero()">
+								<div class='btntxt'>完成入库</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</el-tab-pane>
+			<el-tab-pane label="历史计数统计" class='counttable' name="first" :disabled="tab">
+				<div v-if="Type=='out'">
+					<!-- 出库选择历史订单页 -->
+					<div v-if='outorderkey'>
+						<el-table :data="tableData" border
+							:header-cell-style="{ background: '#F2F6FC', height: '48px', color: '#909399', fontSize: '40px' }"
+							style="width: 910px; margin: 40px auto;font-size: 25px;" :cell-style="totalcellcolor"
+							height="450" :row-style="{ height: '48px' }" v-loadmore="loadMore">
+							<el-table-column align="center" prop="time" label="添加时间">
+							</el-table-column>
+							<el-table-column align="center" prop="num" label="数量">
+							</el-table-column>
+							<el-table-column align="center" label="操作">
+								<template #default="{ row }">
+									<el-button type="primary" round @click='orderdetail(row)' style='font-size: 20px;'>
+										详情
+									</el-button>
+								</template>
+							</el-table-column>
+						</el-table>
+					</div>
+					<div v-else>
+						<!-- 出库历史订单详情页 -->
+						<el-table :data="tableData" border
+							:header-cell-style="{ background: '#F2F6FC', height: '48px', color: '#909399', fontSize: '40px' }"
+							style="width: 910px; margin: 40px auto;font-size: 25px;" :cell-style="totalcellcolor"
+							height="450" :row-style="{ height: '48px' }">
+							<el-table-column align="center" prop="product" label="产品名称">
+							</el-table-column>
+							<el-table-column align="center" prop="num" label="出库数量">
+							</el-table-column>
+						</el-table>
+						<div class='outhistory' @click="outreturn()">
+							<div class='btntxt'>返回</div>
+						</div>
+					</div>
+				</div>
+				<div v-else>
+					<!-- 入库详情页 -->
+					<div class="f" style="justify-content: space-around;margin-top: 17px">
+					</div>
+					<el-table :data="tableData" border
+						:header-cell-style="{ background: '#F2F6FC', height: '48px', color: '#909399', fontSize: '40px' }"
+						style="width: 910px; margin: 40px auto;font-size: 25px;" :cell-style="totalcellcolor"
+						height="450" :row-style="{ height: '48px' }">
+						<el-table-column align="center" prop="product" label="产品名称">
+						</el-table-column>
+						<el-table-column align="center" prop="num" label="入库数量">
+						</el-table-column>
+						<el-table-column align="center" prop="time" label="入库时间">
+						</el-table-column>
+					</el-table>
+				</div>
+			</el-tab-pane>
+		</el-tabs>
+	</div>
+</body>
+<script>
+	const app = new Vue({
+		el: "#page",
+		data: {
+			token: 'Bearer admin-accessToken-eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IkVBNDY5MDAwLUEwRTMtNDM2NS04OEU1LTYzNTk4MUQxNzM2NSIsIm5hbWUiOiLmiavnoIEifQ.ysDSnXIKlGLatjoH2wUIq0r65R8tv9DP_CH0vsOTbN0',
+			//token: '',
+			//Name: 'in1',
+			Name: 'in1',
+			//Name: '',
+			Type: 'in',
+			//Type: 'out',
+			//Type:'',
+			//Remarks: 'in1货口',
+			Remarks: 'out1货口',
+			//Remarks: '',
+			inkey: '',//不断刷新getlist列表的开关
+			StockState: 0,
+			activeName: 'second', //选项卡
+			tab: false, //tabs栏是否锁定
+			list: [], //接收产品列表
+			Ordername: '',//订单名称
+			OrderId: '',//订单id
+			tableData: [], //历史列表
+			countkey: true, //入库实时计数第一页
+			begintime: '', //开始日期
+			endtime: '', //结束日期
+			reconnectkey: '', //经过重连事件
+			closekey: false, //主动断开websokcet链接
+			loadingkey: false,//是否打开蒙版
+			outorderkey: true, //出库历史统计第一页
+			outcountkey: true, //出库计数页第一页
+		},
+		created() {
+			//获取winform数据
+			// this.Name = this.getQueryString('Name')
+			// this.token ='Bearer'+' '+this.getQueryString('token')
+			// this.Type = this.getQueryString('DeliveryType')
+			// this.Remarks = this.getQueryString('Remarks')
+
+			//根据进出类型判断页面加载，查询正在出入库单
+			if (this.Type == 'out') {//如果为出库
+				this.activeName = 'second'//转到第二页
+				this.GetOrderOut()//判断是否有出库单
+				this.tab = false
+			} else {//如果为入库
+				this.getlist()//列表页
+				this.GetScanningOrder()//判断是否有入库单
+			}
+			this.getlistinterval()//不断刷新getlist列表
+		},
+		directives: {
+			// 监听表格滚动
+			loadmore: {
+				bind(el, binding) {
+					const selectWrap = el.querySelector(".el-table__body-wrapper");
+					selectWrap.addEventListener("scroll", function () {
+						const scrollDistance =
+							this.scrollHeight - this.scrollTop - this.clientHeight;
+						if (scrollDistance <= 0.5) {
+							binding.value(); //执行在使用时绑定的函数，在这里即loadMorePerson方法
+						}
+					});
+				},
+			},
+		},
+		beforeDestroy() {
+			clearInterval(this.inkey)//关闭线程
+			this.ws.close()//关闭websocket
+		},
+		methods: {
+			//不断刷新getlist列表
+			getlistinterval() {
+				let that = this
+				if (that.Type == 'in') {
+					that.inkey = setInterval(() => {
+						if (!that.tab && that.countkey) {
+							that.getlist()
+						}
+					}, 5000);
+				}
+				if (that.Type == 'out') {
+					that.inkey = setInterval(() => {
+						if (that.activeName == 'first' && that.outorderkey) {
+							that.getlist()
+						}
+					}, 5000);
+				}
+			},
+			//接收winform数据
+			getQueryString(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+				var r = window.location.search.substr(1).match(reg);
+				if (r != null) return decodeURI(r[2]);
+				return null;
+			},
+			//选项卡
+			handleClick(e) {
+				if (this.activeName == 'first') {//点击历史信息tabs栏
+					if (this.Type == 'out') { //出库历史列表参数
+						this.outorderkey = true//打开出库列表订单页
+						this.value = 'outstorage'//getlist生成出库历史单
+					} else { //入库历史列表参数
+						this.value = 'total'//getlist生成入库历史单
+					}
+					this.getlist()//getlist根据value生出出入库历史单
+				}
+				if (this.activeName == 'second') {//点击实时计数tabs栏
+					if (this.Type == 'out') {//如果类型为出库
+						this.GetOrderOut() //查询出库单状态
+					} else {//如果类型为入库
+						this.value = 'order'//getlist生成入库历史单
+						this.getlist() //getlist生成入库历史单
+					}
+				}
+			},
+			//获取列表
+			getlist() {
+				this.gettime()//获取当天时间
+				let that = this//请求接口不能直接用this
+				if (this.value == 'order') { //入库订单
+					console.log('order')
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetOrderList', {//请求接口
+						Type: '待入库订单',//订单类型
+						PageSize: 99,//页面数据条数
+						CurrentPage: 1,//当前页
+						StockType: that.Name,//入库名称
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							if (that.loadingkey) {
+								that.$loading().close()
+								that.loadingkey = false
+							}
+							that.tableData = []
+							//生成入库单列表
+							let temp = response.data.data.dt//定义temp
+							for (let i = 0; i in temp; i++) {//循环temp
+								that.tableData.push({//赋值给表格数组
+									product: temp[i].Remarks,//产品
+									OrderId: temp[i].Id//订单
+								})
+							}
+						})
+						.catch(function (error) {//捕捉异常
+							console.log('GetOrderList--error', error.message);
+							if (error.message == 'Network Error') {
+								that.loadingkey = true
+								that.$loading({//断线添加蒙版
+									lock: true,//开启锁定
+									text: 'getlist异常，重新链接中',//蒙版文字
+									spinner: 'el-icon-loading',//蒙版图标类型
+									background: 'rgba(0, 0, 0, 0.7)',//蒙版颜色
+								})
+							}
+						});
+				}
+				if (this.value == 'total') { //总计查询
+					console.log('total')
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetOrderList', {//请求接口
+						Type: '已入库订单',//订单类型
+						CurrentPage: 1,//当前页
+						PageSize: 99,//页面数据条数
+						begintime: that.begintime,//初始时间
+						endtime: that.endtime,//入库时间
+						StockType: that.Name//入库名称
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							console.log('total', response)
+							that.tableData = []
+							//生成入库历史列表
+							let temp = response.data.data.dt//赋值给temp
+							for (let i in temp) {//循环temp
+								that.tableData.push({//赋值给表格数组
+									time: temp[i].WarehousingTime.split('T')[0],//时间，去掉T
+									product: temp[i].Remarks.split('>')[1].split('第')[
+										0], //产品名，截取 > 之后以及 第 之前
+									num: temp[i].RealQuantity//数量
+								})
+							}
+						})
+						.catch(function (error) {//捕捉异常
+							console.log(error);
+						});
+				}
+				if (this.value == 'outstorage') { //出库历史查询
+					console.log('outstorage')
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetOrderOutList', {//请求接口
+						Name: that.Name,//出库机组名
+						CurrentPage: 1,//当前页
+						PageSize: 99//页面数据条数
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							//生成出库历史订单
+							that.tableData = []
+							let temp = response.data.data.dt//赋值给temp
+							console.log('outstorage--response', temp)
+							for (let i in temp) {//循环temp
+								that.tableData.push({//赋值给表格数组
+									time: temp[i].AddTime.replace('T', ' '), //去掉T
+									num: temp[i].Quantity,//数量
+									OrderId: temp[i].Id//订单id
+								})
+							}
+							console.log('outstorage--tabledata', that.tableData)
+						})
+						.catch(function (error) {//捕捉异常
+							console.log(error);
+						});
+				}
+			},
+			//入库按钮
+			ordercharge(row) {
+				this.OrderId = row.OrderId //获取行的OrderId
+				this.Ordername = row.product//获取行的产品名称
+				this.StockState = 1//修改订单状态为打开
+				this.EditOrderState() //修改订单状态
+			},
+			//修改入库订单扫码状态
+			EditOrderState() {
+				let that = this//请求接口不能直接用this
+				axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/EditOrderState', {//请求接口
+					OrderId: that.OrderId,//订单id
+					StockType: that.Name,//入库机组名
+					StockState: that.StockState,//订单状态
+				}, {
+					headers: {//头文件
+						'Authorization': that.token//token
+					}
+				})
+					.then(function (response) {//请求到数据
+						console.log('EditOrderStateresponse', response.data.msg)
+						if (response.data.msg != '修改成功') {//如果订单状态修改成功
+							that.message(response.data.msg);//消息提示框
+							that.speak(response.data.msg)
+						}
+						that.GetScanningOrder() //通过 查询入库订单状态 判断有无入库单
+					})
+					.catch(function (error) {//捕捉异常
+						console.log(error);
+					});
+			},
+			//查询入库订单状态
+			GetScanningOrder() {
+				let that = this//请求接口不能直接用this
+				if (that.loadingkey) {
+					that.$loading().close()
+					that.loadingkey = false
+				}
+				that.closekey = false//关闭websocket主动断开开关
+				//清空列表
+				that.list = []//情况计数列表
+				axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetScanningOrder', {//请求接口
+					Type: that.Name//入库机组名
+				}, {
+					headers: {//头文件
+						'Authorization': that.token//token
+					}
+				})
+					.then(function (response) {//请求到数据
+						console.log('GetScanningOrder---success')
+						console.log('GetScanningOrder---response', response.data.data)
+						let reqdata = response.data.data//赋值reqdata
+						if (reqdata.dt != '') { //有正在入库的订单
+							console.log('GetScanningOrder', reqdata.dt)
+							that.countkey = false//打开扫码计数界面
+							that.start() //开始websocket
+							that.Ordername = reqdata.dt[0].Remarks//订单名称
+							that.OrderId = reqdata.dt[0].Id//赋值订单id
+							that.StockState = reqdata.dt[0].StockState//赋值订单状态id
+							that.activeName = 'second'//打开实时计数页
+							that.tab = true//关闭tabs点击功能
+							let name = reqdata.dt[0].Remarks.split('>')[1].split('第')[0] //截取remarks获得产品名
+							that.Ordername = name
+							if (reqdata.dt[0].RealQuantity > 0) { //如果已入库，赋值给扫码列表
+								let num = reqdata.dt[0].RealQuantity//赋值入库数量
+								if (num > 0) {//如果入库数量大于零
+									that.list.push({//赋值给扫码列表
+										id: reqdata.dt[0].ProductId,//赋值商品id
+										name: name,//赋值商品名
+										num: num//赋值入库数量
+									})
+								}
+								console.log('GetScanningOrder--list', that.list)
+							}
+						} else {
+							console.log('GetScanningOrder--else')
+							//如果没入库，返回订单页
+							that.countkey = true//打开选择入库订单页
+							that.tab = false//开启tabs点击功能
+							that.value = 'order'//订单列表
+							that.getlist() //打开订单列表
+							//跳转到订单页关闭websocket
+							that.closekey = true//主动断开websocket标识
+							window.ws.close()//关闭websocket
+						}
+					})
+					.catch(function (error) {
+						console.log('GetScanningOrder--error', error.message)
+						if (error.message == 'Network Error') {
+							that.$loading({//断线添加蒙版
+								lock: true,//开启锁定
+								text: 'GetScanningOrder异常，重新链接中',//蒙版文字
+								spinner: 'el-icon-loading',//蒙版图标类型
+								background: 'rgba(0, 0, 0, 0.7)',//蒙版颜色
+							})
+							setTimeout(() => {
+								that.GetScanningOrder()
+							}, 5000);
+						}
+					});//捕捉异常
+			},
+			//入库订单回滚
+			DelCodeOrder() {
+				let that = this//请求接口不能直接用this
+				that.$confirm('此操作将回滚订单且需重新扫描产品, 是否继续?', { //回滚弹窗
+					confirmButtonText: '确定',//点击确定
+					cancelButtonText: '取消',//点击取消
+					customClass: 'messageclass',
+					confirmButtonClass: 'confirmButton',
+					cancelButtonClass: 'cancelButton',
+				}).then(() => {//点击确认后
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/DelCodeOrder', {//请求接口
+						Id: that.OrderId//订单id
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							console.log('DelCodeOrder--response', response.data.msg)
+							if (response.data.msg == '回滚成功') {//订单回滚成功
+								that.message(response.data.msg)//消息提示框
+								that.speak(response.data.msg)
+							} else {//回滚失败
+								that.message(response.data.msg)//提示失败原因
+								that.speak(response.data.msg)
+							}
+							that.GetScanningOrder() //根据 查询入库订单状态 返回订单列表页
+						})
+						.catch(function (error) { });//捕捉异常 
+				}).catch(() => {//点击取消后
+					that.message('已取消回滚')//消息框提示已取消回滚
+					that.speak('已取消回滚')
+				});
+			},
+			//入库订单取消入库
+			EditCloseOrderState() {
+				let that = this//请求接口不能直接用this
+				that.$confirm('此操作将取消入库, 是否继续?', {//取消弹窗
+					confirmButtonText: '确定',//点击确定
+					cancelButtonText: '取消',//点击取消
+					customClass: 'messageclass',
+					confirmButtonClass: 'confirmButton',
+					cancelButtonClass: 'cancelButton',
+				}).then(() => {//点击确认后
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/EditCloseOrderState', {//请求接口
+						OrderId: that.OrderId//订单id
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							console.log('EditCloseOrderState--response', response.data.msg)
+							if (response.data.msg == '修改成功') {//取消入库成功
+								that.message(response.data.msg)//消息提示框
+								that.speak(response.data.msg)
+							} else {//取消入库失败
+								that.message("已取消入库")//消息框提示已取消入库
+								that.speak("已取消入库")
+							}
+							that.GetScanningOrder() //根据 查询入库订单状态 返回订单列表页
+						})
+						.catch(function (error) { });//捕捉异常
+				}).catch(() => {//点击取消
+					that.message('已取消关闭')//消息框提示已取消入库
+					that.speak("已取消关闭")
+				});
+			},
+			//查看出库订单详情按钮
+			orderdetail(row) {//出库详情按钮
+				this.OrderId = row.OrderId//获取点击行的订单id
+				this.tab = true
+				this.GetOrderOutListDetail() //根据OrderId获取详情表
+			},
+			//查询出库订单明细
+			GetOrderOutListDetail() {
+				let that = this//请求接口不能直接用this
+				//清空列表
+				that.tableData = []//清空历史数据列表
+				that.list = []//清空扫码信息列表
+				axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetOrderOutListDetail', {//请求接口
+					OrderId: that.OrderId//订单id
+				}, {
+					headers: {//头文件
+						'Authorization': that.token//token
+					}
+				})
+					.then(function (response) {//请求到数据
+						console.log('GetOrderOutListDetail--detail', response.data)
+						let temp = response.data.data.dts//赋值给temp
+						if (response.data.msg == '查询成功') {//查询到订单详情
+							that.outorderkey = false//打开出库订单详情界面
+							//获取订单详情表
+							for (let i in temp) {//循环temp
+								that.tableData.push({//赋值历史数据列表
+									product: temp[i].Name,//产品名称
+									num: temp[i].allcount,//产品数量
+								})
+							}
+							//根据 查询出库订单状态 获得当前出库订单列表
+							if (that.outcountkey == false) {//如果当前页为计数页
+								that.start()//开启websocket
+								for (let i in temp) {//循环temp
+									that.list.push({//赋值给扫码列表页
+										name: temp[i].Name,//出库机组名
+										num: temp[i].allcount,//出库产品数量
+										id: temp[i].ProductId//产品id
+									})
+									console.log('list', that.list)
+								}
+								//没有历史出库详情
+								if (response.data.msg == '无历史订单') {//有生成的出库单但没有扫码信息
+									that.start()//开启websocket
+								}
+							}
+						}
+					})
+					.catch(function (error) { });
+			},
+			//表格触底事件
+			loadMore() {
+				this.CurrentPage++;
+				this.GetOrderOutList();
+			},
+			//按钮，返回历史出库列表
+			outreturn() {//出库订单详情页返回按钮
+				this.outorderkey = true//返回出库历史第一页
+				this.getlist()//读取出库订单
+			},
+			//生成出库订单
+			AddOrderOut() {//点击出库按钮
+				this.list = []//清空扫码信息
+				let that = this//请求接口不能直接用this
+				axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/AddOrderOut', {//调用生成出库订单接口
+					Name: that.Name//出库机组名
+				}, {
+					headers: {//头文件
+						'Authorization': that.token//token
+					}
+				})
+					.then(function (response) {//请求到数据
+						console.log('AddOrderOutresponse', response.data.msg)
+						if (response.data.msg == '添加成功') {//请求出库单成功
+							//跳转后开启websocket
+							that.outcountkey = false//跳转到出库扫码页
+							that.start()//开启websokcet
+						} else {//请求出库单失败
+							that.message(response.data.msg)//消息框提示错误信息
+							that.speak(response.data.msg)
+						}
+					})
+					.catch(function (error) { });//捕捉异常
+			},
+			//查询出库订单状态
+			GetOrderOut() {//查询出库订单状态
+				this.list = []//清空扫码列表
+				let that = this//请求接口不能直接用this
+				axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/GetOrderOut', {//调用查询出库订单状态接口
+					Name: that.Name//出库机组名
+				}, {
+					headers: {//头文件
+						'Authorization': that.token//token
+					}
+				})
+					.then(function (response) {//请求到数据
+						console.log('GetOrderOut--response', response.data)
+						console.log('GetOrderOut--id', response.data.data.model.Id)
+						if (response.data.msg == '查询成功') {//存在正在出库的订单
+							//存在正在出库的订单.跳转到第二页，查询订单详情
+							console.log('GetOrderOut--查询成功')
+							that.outcountkey = false//跳转到出库扫码计数页
+							that.tab = true//锁定tabs
+							let temp = response.data.data.model//赋值temp
+							that.OrderId = temp.Id//获取订单id
+							that.GetOrderOutListDetail()//调用查询出库明细接口查询正在出库订单的名称
+						}
+						if (response.data.msg == '无激活订单') {//不存在正在出库的订单
+							//没有正在出库的订单跳转到第一页
+							that.outcountkey = true//跳转到出库订单生成页
+						}
+					})
+					.catch(function (error) { });//捕捉错误
+			},
+			//完成出库订单
+			EditOrderOutState() {//完成出库订单按钮
+				let that = this//请求接口不能直接用this
+				that.closekey = false//关闭websocket主动断开开关
+				that.$confirm('此操作将上传出库, 是否继续?', {//确认出库弹窗
+					confirmButtonText: '确定',//确认出库
+					cancelButtonText: '取消',//取消出库
+					customClass: 'messageclass',
+					confirmButtonClass: 'confirmButton',
+					cancelButtonClass: 'cancelButton',
+				}).then(() => {//点击确定
+					axios.post('https://www.moondeity.com:8308/api/Areas/OrderInfo/EditOrderOutState', {//请求完成出库订单接口
+						Name: that.Name//出库机组名
+					}, {
+						headers: {//头文件
+							'Authorization': that.token//token
+						}
+					})
+						.then(function (response) {//请求到数据
+							console.log('EditOrderOutStateresponse', response.data)
+							if (response.data.msg == '修改成功') {//出库成功
+								//出库成功跳转到第一页关闭websocket
+								that.message('修改成功')//消息框提示修改成功
+								that.speak('修改成功')
+								that.outcountkey = true//跳转到出库订单生成页
+								that.tab = false//解锁tabs
+								that.closekey = true//主动断开websokcet标识
+								window.ws.close()//关闭websokcet
+							} else {//出库失败
+								that.message(response.data.msg)//消息框提示错误
+								that.speak(response.data.msg)
+							}
+						})
+						.catch(function (error) { });//捕捉异常
+				}).catch(() => {//点击取消
+					that.message('已取消')//消息框提示已取消
+					that.speak('已取消')
+				});
+			},
+			//按钮，上传数据
+			zero() {//上传与出库按钮
+				if (this.Type == 'out') {//如果类型为出库
+					//上传出库数据
+					this.EditOrderOutState()//查看是否有正在出库的订单
+				} else {//如果为入库
+					//上传入库数据
+					this.$confirm('此操作将上传订单且无法修改, 是否继续?', {//确认入库弹窗
+						confirmButtonText: '确定',//确定入库
+						cancelButtonText: '取消',//取消入库
+						customClass: 'messageclass',
+						confirmButtonClass: 'confirmButton',
+						cancelButtonClass: 'cancelButton',
+					}).then(() => {//点击确认
+						this.StockState = 0//改变订单状态为关闭
+						this.EditOrderState()//调用改变订单状态接口
+					}).catch(() => {//点击取消
+						this.message('已取消')//消息框提示已取消
+						this.speak('已取消')
+					});
+				}
+			},
+			//websocket
+			start() {
+				console.log("开始连接")
+				let webhttp = "ws://192.168.99.175:8383/" + this.Name//拼接连接网址接口和出入库机组名
+				this.list = []//清空扫码数组
+				var that = this//请求接口不能直接用this
+				if (window.WebSocket) {//如果存在websocket连接
+					var wsImpl = window.WebSocket || window.MozWebSocket;//创建websocket类型
+					window.ws = new wsImpl(webhttp);//创建带有具体信息的websocket
+					ws.onmessage = function (e) { //websocket的返回数据
+						if (e.data != "connect") {//connect为连接提示信息
+							let temp = JSON.parse(e.data)//反序列化传来的数据
+							console.log('websocket data', temp)
+							if (temp.code == 201) {//错误码为201
+								that.message(temp.msg)//消息框提示错误信息
+								that.speak(temp.msg)
+							}
+							if (temp.code == 200) {//正确码为200
+								id = temp.data.Id//产品id
+								name = temp.data.Name//产品名称
+								if (app.list.length == 0) { //列表没有数据添加产品
+									app.list.push({//添加扫码列表
+										id,//产品id
+										name,//产品名称
+										num: temp.data.Num//产品数量，新添加的产品数量为1
+									})
+								} else { //列表已有数据判断产品是否已有
+									var key = false//判断是否有重复项
+									var t//获取重复id的变量
+									for (let i in app.list) {//循环接收到的列表
+										if (id == app.list[i].id) {//如果存在与当前列表相同产品
+											key = true //如果存在重复项赋值k，根据k的状态判断是否添加新行
+											t = i//获得重复的id
+											app.list[i].num = temp.data.Num//产品数量+1
+											break;//跳出循环
+										}
+									}
+									if (key) { //存在重复项目，将最新扫码的产品放入最下方
+										let temp = app.list[t]//将新加数组赋值给temp
+										app.list.splice(t, 1)//删除最后一组数据
+										app.list.push(temp)//在删除位置添加新元素
+									} else { //不存在k，添加新行
+										app.list.push({//添加新产品
+											id,//产品id
+											name,//产品名称
+											num: temp.data.Num//新加产品
+										})
+									}
+								}
+								setTimeout(() => {
+									that.$refs.table.bodyWrapper.scrollTop = that.$refs.table
+										.bodyWrapper
+										.scrollHeight
+								}, 50)//延时调换列表顺序
+							}
+						}
+					};
+					ws.onopen = function () { //连接事件
+						that.$loading().close() //关闭蒙版
+						if (that.reconnectkey) {//如果通过重连事件后连接成功
+							that.message('网络连接成功')//消息提示网络连接成功
+							that.speak('网络连接成功')
+							that.reconnectkey = false//判断是否重连的key恢复默认值
+						}
+						console.log('websocket open')
+					};
+					ws.onclose = function () { //关闭事件
+						console.log('onclose--that.closekey', that.closekey)
+						if (that.closekey) {//如果为主动关闭websocket
+							console.log('主动断开连接')
+						} else {//如果不为主动断开连接
+							console.log('网络断开')
+							that.reconnect()//开始断线重连
+						}
+					};
+					ws.error = function () { //异常
+						console.log('error')
+						that.reconnect()//开始断线重连
+					};
+				}
+			},
+			//重连事件
+			reconnect() {
+				console.log('no connect')
+				this.$loading({//断线添加蒙版
+					lock: true,//开启锁定
+					text: '网络异常，重新链接中',//蒙版文字
+					spinner: 'el-icon-loading',//蒙版图标类型
+					background: 'rgba(0, 0, 0, 0.7)',//蒙版颜色
+				})
+				this.message("网络连接失败")//消息框提示网络连接失败
+				this.speak("网络连接失败")
+				this.reconnectkey = true//经过断线重连事件
+				var that = this//settimeout不能直接用this
+				setTimeout(() => {
+					that.start()
+				}, 5000);//延时5s重新打开websocket
+			},
+			//弹窗提示
+			message(msg) {
+				console.log('message')
+				if (msg == 'success') {//如果msg为succes
+					msg = '成功'//提示成功
+				}
+				const h = this.$createElement//遮罩层
+				let tempHtml = h(
+					'p', {
+					style: ' width: 100%; display:flex;align-items: center;justify-content: space-between;',//样式
+				},
+					[
+						h('span', undefined, msg),//显示图标和文字
+					]
+				)
+				if (msg.indexOf('成功') != '-1') {//如果msg中存在‘成功’
+					this.$message({//消息提示框
+						dangerouslyUseHTMLString: true,//支持传入 HTML 片段
+						duration: 2000,//持续时间
+						type: 'success',//图标类型
+						message: tempHtml,//显示文字
+						customClass: 'workShop_message',//提示框样式
+					})
+					return true//返回true
+				} else {
+					this.$message({//消息提示框
+						dangerouslyUseHTMLString: true,//支持传入 HTML 片段
+						duration: 2000,//持续时间
+						type: 'error',//图标类型
+						message: tempHtml,//显示文字
+						customClass: 'workShop_message',//提示框样式
+					})
+					return false//返回false
+				}
+			},
+			//表格颜色
+			batchcellcolor({
+				row,//行
+				column,//列
+				rowIndex,//行index
+				columnIndex//列index
+			}) {
+				if (columnIndex == 2) {//如果为第二行
+					return 'color:red'//字体为红色
+				}
+			},
+			//表格颜色
+			totalcellcolor({
+				row,//行
+				column,//列
+				rowIndex,//行inedx
+				columnIndex//列index
+			}) {
+				if (columnIndex == 1) {//如果为第一行
+					return 'color:red'//字体为红色
+				}
+			},
+			//当前日期
+			gettime() {
+				let yy = new Date().getFullYear();//当前年
+				let mm = new Date().getMonth() + 1;//当前月
+				let dd = new Date().getDate();//当前日
+				this.begintime = yy + '-' + mm + '-' + dd;//当天时间
+				this.endtime = yy + '-' + mm + '-' + dd;//当天时间
+			},
+			//语音
+			speak(msg) {
+				var msgSpeak = new SpeechSynthesisUtterance();
+				this.getVoices = window.speechSynthesis.getVoices()[2];
+				msgSpeak.text = msg; // 文字内容
+				//msgSpeak.lang = this.getVoices.lang; // 使用的语言:中文
+				msgSpeak.volume = 1; // 声音的音量，区间范围是0到1，默认是1。
+				msgSpeak.rate = 1.2; // 设置播放语速，范围：0.1 - 10之间    正常为1倍播放
+				msgSpeak.pitch = 2; // 表示说话的音高，数值，范围从0（最小）到2（最大）。默认值为1。
+				msgSpeak.voice = this.getVoices;
+				window.speechSynthesis.cancel();
+				window.speechSynthesis.speak(msgSpeak);
+			},
+		}
+	})
+</script>
+
+</html>
